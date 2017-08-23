@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/fmieres/telegram-ffbe-bot#readme",
   "dependencies": {
-    "data": "git+https://git@github.com/aEnigmatic/ffbe.git",
-    "mongo": "^0.1.0"
+    "data": "git+https://git@github.com/aEnigmatic/ffbe.git"
   }
 }
