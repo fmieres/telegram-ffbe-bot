@@ -3,6 +3,13 @@ from pymongo import MongoClient
 
 
 ################################
+# Globals
+###################################################################
+
+DB_CLIENT = None
+
+
+################################
 # Decorators
 ###################################################################
 
@@ -21,22 +28,22 @@ def catch_exceptions(func):
 ###################################################################
 
 def create_connection():
-	print "Mongo DB - Connection Created"
-	return MongoClient('localhost', 27017)
-	
+    global DB_CLIENT
+    DB_CLIENT = MongoClient('localhost', 27017)
+    print "Mongo DB - Connection Created"
 
-def close_connection(db_client):
-	print "Mongo DB - Connection Closed"
-	db_client.close()
+def close_connection():
+    print "Mongo DB - Connection Closed"
+    DB_CLIENT.close()
 
-def update_units(db_client):
-	print "Mongo DB - Updating Units Collection..."
-	db = db_client.ffbe
-	units_collection = db.units
-	units_collection.remove()
+def update_units():
+    print "Mongo DB - Updating Units Collection..."
+    db = DB_CLIENT.ffbe
+    units_collection = db.units
+    units_collection.remove()
 
-	units = get_units()
-	result = units_collection.insert_many(units)
+    units = get_units()
+    result = units_collection.insert_many(units)
 
 
 ################################
@@ -44,16 +51,16 @@ def update_units(db_client):
 ###################################################################
 
 def format_data(data):
-	def with_id(properties, item_id):
-		properties['id'] = item_id
-		return properties
+    def with_id(properties, item_id):
+        properties['id'] = item_id
+        return properties
 
-	return [with_id(properties, item_id) for item_id, properties in data.items()]
+    return [with_id(properties, item_id) for item_id, properties in data.items()]
 
 @catch_exceptions
 def get_units():
-	with open('./node_modules/data/units.json') as units_json:
-	    return format_data(json.load(units_json))
+    with open('./node_modules/data/units.json') as units_json:
+        return format_data(json.load(units_json))
 
 
 ################################
@@ -61,9 +68,7 @@ def get_units():
 ###################################################################
 
 if __name__ == "__main__":
-	db_client = create_connection()
-
-	update_units(db_client)
-
-	close_connection(db_client)
-	
+    create_connection()
+    update_units()
+    close_connection()
+    
