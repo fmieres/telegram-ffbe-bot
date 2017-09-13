@@ -36,14 +36,18 @@ def close_connection():
     print "Mongo DB - Connection Closed"
     DB_CLIENT.close()
 
-def update_units():
-    print "Mongo DB - Updating Units Collection..."
+def update_collection(collection_name):
+    print "Mongo DB - Updating '%s' Collection..." % collection_name
     db = DB_CLIENT.ffbe
-    units_collection = db.units
-    units_collection.remove()
+    db_collection = getattr(db, collection_name)
+    db_collection.remove()
 
-    units = get_units()
-    result = units_collection.insert_many(units)
+    json_collection = get_collection_data(collection_name)
+    return db_collection.insert_many(json_collection)
+
+def update_collections():
+    update_collection('units')
+    update_collection('skills')
 
 
 ################################
@@ -58,9 +62,9 @@ def format_data(data):
     return [with_id(properties, item_id) for item_id, properties in data.items()]
 
 @catch_exceptions
-def get_units():
-    with open('./node_modules/data/units.json') as units_json:
-        return format_data(json.load(units_json))
+def get_collection_data(collection_name):
+    with open('./node_modules/data/%s.json' % collection_name) as collection_json:
+        return format_data(json.load(collection_json))
 
 
 ################################
@@ -69,6 +73,6 @@ def get_units():
 
 if __name__ == "__main__":
     create_connection()
-    update_units()
+    update_collections()
     close_connection()
     
