@@ -65,9 +65,10 @@ def unit_names(message):
 def unit(message):
   try :
     name = message.text.split(' ',1)[1]
+    if name.startswith("Zarg"): name = 'Zargabaath'
     unit = find_by_name(name)
     bot.reply_to(message, json.dumps(unit))
-  except Exception, e:
+  except Exception:
     bot.reply_to(message, "unit name '" + name + "' not found")
 
 @bot.message_handler(func=lambda m: True)
