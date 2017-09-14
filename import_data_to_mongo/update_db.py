@@ -56,7 +56,7 @@ def update_collections():
 
 def format_data(data):
     def with_id(properties, item_id):
-        properties['id'] = item_id
+        properties['id'] = int(item_id)
         return properties
 
     return [with_id(properties, item_id) for item_id, properties in data.items()]

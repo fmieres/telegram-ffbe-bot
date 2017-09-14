@@ -6,9 +6,14 @@ Los datos son obtenidos de https://github.com/aEnigmatic/ffbe .
 
 npm update + update_db.py actualiza mongo con los datos obtenidos del repo de aEnigmatic.
 
-### Bot
 
-Para correrrlo
+## Bot
+
+### Instalación
+
+	pip install pyTelegramBotAPI
+
+### Uso
     
     python bot/main.py {TOKEN}
     
