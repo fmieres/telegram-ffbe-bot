@@ -31,3 +31,8 @@ autorestart=true
 stdout_logfile=/var/log/supervisor/telebot.ffbe.log
 stderr_logfile=/var/log/supervisor/telebot.fbbe-error.log
 ```
+
+supervisor corre como root así que es necesario instalar las mismas librerías de pip como root
+  
+    pip install pyTelegramBotAPI
+    pip install pymongo
