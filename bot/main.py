@@ -12,10 +12,13 @@ repo = Repository()
 log = Log(STOUTHandler())
 log.info("Setting up bot")
 
+
 @bot.message_handler(commands=['help'])
 def help(message):
   bot.send_message(message.chat.id, 'I am a ffbe info bot, available commands: unit_names, unit')
 
+#@log.checkError()  # quiero esto
+#@catchExceptions   #  no quiero esto
 @bot.message_handler(commands=['unit_names'])
 def unit_names(message):
   try :
