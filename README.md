@@ -23,7 +23,7 @@ El token se solicita al admin
 
 ```
 [program:telebot.ffbe]
-command=python main.py <<TOKEN>>
+command=python main.py {TOKEN}
 process_name=%(program_name)s
 directory=/home/federico/develop/self/telegram_exvius_bot/bot/
 autostart=false
