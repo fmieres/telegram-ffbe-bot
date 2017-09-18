@@ -1,5 +1,6 @@
 import sys
 import logging
+from json import dumps
 
 class Log :
 
@@ -16,12 +17,12 @@ class Log :
     logger.setLevel(logging.INFO)
     return logger
 
-  def info(self,message) :
+  def info(self,message, json=False) :
+    message = message if json == False else dumps(message)
     return self.__logger.info(message)
 
   def error(self, message, exc_info=False):
     return self.__logger.error(message, exc_info=exc_info)
-    # return self.__logger.error(message)
 
 
 class STOUTHandler :
