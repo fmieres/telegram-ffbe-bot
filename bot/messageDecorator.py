@@ -11,7 +11,7 @@ class MessageDecorator :
     return self.__log
 
   def unitWithSkills(self, unit, caller, message) :
-    return caller(message, self._unitWithSkills(unit) ,parse_mode = self.__parseMode)
+    return caller(message, self._unitWithSkills(unit), parse_mode = self.__parseMode)
 
   @abstractmethod
   def _unitWithSkills(self, unit) : 

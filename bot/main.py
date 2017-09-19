@@ -5,14 +5,18 @@ import sys
 from pprint import pprint
 from repository import Repository
 from loggingInterface import Log, STOUTHandler
-from messageDecorator import HtmlDecorator
+from printers.unitPrinter import UnitPrinter
 
 token =  sys.argv[1]
 bot = telebot.TeleBot(token)
 repo = Repository()
 log = Log(STOUTHandler())
 log.info("Setting up bot")
-decorator = HtmlDecorator(log)
+
+
+#####################
+# BOT COMMANDS
+###########################
 
 @bot.message_handler(commands=['help'])
 # @log.error_handler()
@@ -27,18 +31,16 @@ def unit_names(message):
     name = message.text.split(' ',1)[1]
     unit = repo.find_unit_by_name(name)
     bot.reply_to(message, json.dumps(unit["names"]))
-  except Exception as e:
+  except Exception:
     log.error("Exception:", exc_info=True)
     bot.reply_to(message, "unit name '" + name + "' not found")
 
 @bot.message_handler(commands=['unit'])
 def unit(message):
+  params = message.text.split(' ')
+  name = params[1].title()
   try :
-    name = message.text.split(' ',1)[1]
-    if name.startswith("Zarg"): name = 'Zargabaath'
-    unit = repo.find_unit_by_name(name)
-    log.info(unit, json=True)
-    decorator.unitWithSkills(unit = unit, caller = bot.reply_to, message = message)
+    printResponse(message, name, params[2:])
     # bot.reply_to(message, decorator.unitWithSkills(unit))
     # bot.reply_to(message, json.dumps(unit))
   except Exception:
@@ -49,5 +51,23 @@ def unit(message):
 def default_message_unknown(message):
   bot.reply_to(message, 'unknown command: ' + message.text)
 
-log.info("Bot ready, polling")
-bot.polling()
+
+#####################
+# SUB-TASKS
+###########################
+
+def printResponse(message, name, sections):
+  unit_name = name
+  if name.startswith("Zarg"): unit_name = 'Zargabaath'
+  unit = repo.find_unit_by_name(unit_name)
+  #log.info(unit, json=True)
+  UnitPrinter.printResponse(bot.reply_to, unit, sections, message, pType = 'HTML')
+
+
+#####################
+# MAIN
+###########################
+
+if __name__ == '__main__':
+  log.info("Bot ready, polling")
+  bot.polling()
