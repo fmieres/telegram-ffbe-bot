@@ -2,10 +2,6 @@ from pymongo import MongoClient
 
 class Repository :
 
-  def __init__(self):
-    pass
-
-
   def find_unit_by_name(self, name):
     client = MongoClient('mongodb://localhost:27017/')
 

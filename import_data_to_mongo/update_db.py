@@ -43,6 +43,9 @@ def update_collection(collection_name):
     db_collection.remove()
 
     json_collection = get_collection_data(collection_name)
+    #for row in json_collection:
+    #    if 'name' in row: row['name'] = row['name'].title()
+        
     return db_collection.insert_many(json_collection)
 
 def update_collections():

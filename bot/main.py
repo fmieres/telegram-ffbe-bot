@@ -59,10 +59,34 @@ def default_message_unknown(message):
 def printResponse(message, name, sections):
   unit_name = name
   if name.startswith("Zarg"): unit_name = 'Zargabaath'
+  unit_name = checkAbreviations(unit_name)
+
   unit = repo.find_unit_by_name(unit_name)
   #log.info(unit, json=True)
   UnitPrinter.printResponse(bot.reply_to, unit, sections, message, pType = 'HTML')
 
+def checkAbreviations(name):
+  abreviations = {
+    'Wol': 'Warrior of Light',
+    'Vod': 'Veritas of the Dark',
+    'Dv': 'Veritas of the Dark',
+    'Vof': 'Veritas of the flame',
+    'Fv': 'Veritas of the flame',
+    'Voe': 'Veritas of the Earth',
+    'Ev': 'Veritas of the Earth',
+    'Vow': 'Veritas of the Waters',
+    'Wv': 'Veritas of the Waters',
+    'Vol': 'Veritas of the Light',
+    'Lv': 'Veritas of the Light',
+    'Voh': 'Veritas of the Heavens',
+    'Hv': 'Veritas of the Heavens',
+    'Wkn': 'White Knight Noel',
+    'Tt': 'Trance Terra',
+    'Cod': 'Cloud of Darkness',
+    'Dkc': 'Dark Knight Cecil',
+  }
+
+  return abreviations[name] if name in abreviations else name
 
 #####################
 # MAIN
