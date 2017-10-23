@@ -5,6 +5,8 @@ class Printer:
 	pass
 
 class UnitPrinter(Printer):
+	sections = ['skills']
+
 	@classmethod
 	def printResponse(cls, caller, unit, sections, message, pType = 'HTML'):
 		reponse = ''

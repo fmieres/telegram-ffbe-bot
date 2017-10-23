@@ -2,10 +2,12 @@ import logging
 import telebot
 import json
 import sys
-from pprint import pprint
+#from pprint import pprint
 from repository import Repository
 from loggingInterface import Log, STOUTHandler
 from printers.unitPrinter import UnitPrinter
+from printers.materiaPrinter import MateriaPrinter
+#from utils import catch_exceptions
 
 token =  sys.argv[1]
 bot = telebot.TeleBot(token)
@@ -23,8 +25,7 @@ log.info("Setting up bot")
 def help(message):
   bot.send_message(message.chat.id, 'I am a ffbe info bot, available commands: unit_names, unit')
 
-#@log.checkError()  # quiero esto
-#@catchExceptions   #  no quiero esto
+'''
 @bot.message_handler(commands=['unit_names'])
 def unit_names(message):
   try :
@@ -34,18 +35,29 @@ def unit_names(message):
   except Exception:
     log.error("Exception:", exc_info=True)
     bot.reply_to(message, "unit name '" + name + "' not found")
+'''
 
 @bot.message_handler(commands=['unit'])
 def unit(message):
   params = message.text.split(' ')
   name = params[1].title()
   try :
-    printResponse(message, name, params[2:])
-    # bot.reply_to(message, decorator.unitWithSkills(unit))
-    # bot.reply_to(message, json.dumps(unit))
+    printUnit(message, name, params[2:])
   except Exception:
     log.error("Exception:", exc_info=True)
     bot.reply_to(message, "unit name '" + name + "' not found")
+
+
+@bot.message_handler(commands=['materia'])
+def materia(message):
+  params = message.text.split(' ', 1)
+  name = params[1].title()
+  try :
+    printMateria(message, name)
+  except Exception:
+    log.error("Exception:", exc_info=True)
+    bot.reply_to(message, "Materia name '" + name + "' not found")
+
 
 @bot.message_handler(func=lambda m: True)
 def default_message_unknown(message):
@@ -56,14 +68,19 @@ def default_message_unknown(message):
 # SUB-TASKS
 ###########################
 
-def printResponse(message, name, sections):
+def printUnit(message, name, sections):
   unit_name = name
   if name.startswith("Zarg"): unit_name = 'Zargabaath'
   unit_name = checkAbreviations(unit_name)
 
   unit = repo.find_unit_by_name(unit_name)
   #log.info(unit, json=True)
-  UnitPrinter.printResponse(bot.reply_to, unit, sections, message, pType = 'HTML')
+  UnitPrinter.printResponse(bot.reply_to, unit, sections, message)
+
+def printMateria(message, materia_name):
+  materia = repo.find_materia_by_name(materia_name)
+  log.info(materia, json=True)
+  MateriaPrinter.printResponse(bot.reply_to, materia, message)
 
 def checkAbreviations(name):
   abreviations = {

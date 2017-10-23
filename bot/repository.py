@@ -2,8 +2,16 @@ from pymongo import MongoClient
 
 class Repository :
 
+  REPO = 'mongodb://localhost:27017/'
+
+  def find_materia_by_name(self, name):
+    client = MongoClient(self.REPO)
+    materia = client.ffbe.materia.find_one({"name" : name})
+    del materia['_id']
+    return materia
+
   def find_unit_by_name(self, name):
-    client = MongoClient('mongodb://localhost:27017/')
+    client = MongoClient(self.REPO)
 
     #unit = client.ffbe.units.find_one({"name" : name })
     units = client.ffbe.units.aggregate([

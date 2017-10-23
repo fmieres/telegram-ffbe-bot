@@ -51,6 +51,9 @@ def update_collection(collection_name):
 def update_collections():
     update_collection('units')
     update_collection('skills')
+    update_collection('materia')
+    update_collection('equipment')
+    update_collection('items')
 
 
 ################################
