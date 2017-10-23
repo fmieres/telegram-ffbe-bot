@@ -1,22 +1,49 @@
 from pymongo import MongoClient
+import re
 
 class Repository :
 
   REPO = 'mongodb://localhost:27017/'
 
+  def find_equipment_by_name(self, name, client = None):
+    if not client:
+      client = MongoClient(self.REPO)
+    
+    equipment = client.ffbe.equipment.find_one({"name" : re.compile(name, re.IGNORECASE)})
+    if equipment:
+      equipment['print_type'] = 'equipment'
+      del equipment['_id']
+
+    return equipment
+
+  def find_skill_by_name(self, name, client = None):
+    if not client:
+      client = MongoClient(self.REPO)
+
+    skill = client.ffbe.skills.find_one({"name" : re.compile(name, re.IGNORECASE)})
+    if skill:
+      skill['print_type'] = 'skill'
+      del skill['_id']
+
+    return skill
+
   def find_materia_by_name(self, name):
     client = MongoClient(self.REPO)
-    materia = client.ffbe.materia.find_one({"name" : name})
-    del materia['_id']
-    return materia
+    materia = self.find_skill_by_name(name, client)
+    if materia:
+      return materia
+    else:
+      return self.find_equipment_by_name(name, client)
 
   def find_unit_by_name(self, name):
     client = MongoClient(self.REPO)
+    
+    unit_name = name.lower()
+    if unit_name.startswith("zarg"): unit_name = 'Zargabaath'
 
-    #unit = client.ffbe.units.find_one({"name" : name })
     units = client.ffbe.units.aggregate([
 
-      {'$match': {"name": name}},
+      {'$match': {"name": re.compile(unit_name, re.IGNORECASE)}},
       
       {'$unwind':"$skills"},
       

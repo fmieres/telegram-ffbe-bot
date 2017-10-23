@@ -69,10 +69,7 @@ def default_message_unknown(message):
 ###########################
 
 def printUnit(message, name, sections):
-  unit_name = name
-  if name.startswith("Zarg"): unit_name = 'Zargabaath'
-  unit_name = checkAbreviations(unit_name)
-
+  unit_name = checkAbreviations(name)
   unit = repo.find_unit_by_name(unit_name)
   #log.info(unit, json=True)
   UnitPrinter.printResponse(bot.reply_to, unit, sections, message)
