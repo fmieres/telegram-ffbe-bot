@@ -1,6 +1,4 @@
 */node_modules
 /import_data_to_mongo/package-lock.json
 
-/bot/loggingInterface.pyc
-
-/bot/messageDecorator.pyc
+*.py[cod]
