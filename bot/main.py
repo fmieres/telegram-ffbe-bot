@@ -6,7 +6,7 @@ import sys
 from repository import Repository
 from loggingInterface import Log, STOUTHandler
 from printers.unitPrinter import UnitPrinter
-from printers.materiaPrinter import MateriaPrinter
+from printers.tmrPrinter import TmrPrinter
 #from utils import catch_exceptions
 
 token =  sys.argv[1]
@@ -48,8 +48,8 @@ def unit(message):
     bot.reply_to(message, "unit name '" + name + "' not found")
 
 
-@bot.message_handler(commands=['materia'])
-def materia(message):
+@bot.message_handler(commands=['tmr'])
+def tmr(message):
   params = message.text.split(' ', 1)
   name = params[1].title()
   try :
@@ -77,7 +77,7 @@ def printUnit(message, name, sections):
 def printMateria(message, materia_name):
   materia = repo.find_materia_by_name(materia_name)
   log.info(materia, json=True)
-  MateriaPrinter.printResponse(bot.reply_to, materia, message)
+  TmrPrinter.printResponse(bot.reply_to, materia, message)
 
 def checkAbreviations(name):
   abreviations = {
