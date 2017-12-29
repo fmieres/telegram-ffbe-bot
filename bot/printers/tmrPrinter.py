@@ -9,7 +9,7 @@ class TmrPrinter(Printer):
 
 	@classmethod
 	def printResponse(cls, caller, tmr, message, pType = 'HTML'):
-		if tmr['type'] == 'EQUIP':
+		if tmr['tmr_type'] == 'EQUIP':
 			return EquipmentPrinter.printResponse(caller, tmr, message, pType)
 		else:
 			return MateriaPrinter.printResponse(caller, tmr, message, pType)

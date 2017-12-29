@@ -64,7 +64,7 @@ def create_tmr_collection():
                 tmr = DB_CLIENT.ffbe.equipment.find_one( {"id": tmr_id} )
             else:
                 tmr = DB_CLIENT.ffbe.materia.find_one( {"id": tmr_id} )
-            tmr['type'] = tmr_type
+            tmr['tmr_type'] = tmr_type
             tmrs_collection.append(tmr)
     
     DB.tmr.insert_many(tmrs_collection)
