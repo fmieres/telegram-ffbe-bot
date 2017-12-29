@@ -1,5 +1,5 @@
 from equipmentPrinter import EquipmentPrinter
-from skillPrinter import SkillPrinter
+from materiaPrinter import MateriaPrinter
 
 # Mover a un archivo aparte
 class Printer:
@@ -12,4 +12,4 @@ class TmrPrinter(Printer):
 		if tmr['type'] == 'EQUIP':
 			return EquipmentPrinter.printResponse(caller, tmr, message, pType)
 		else:
-			return SkillPrinter.printResponse(caller, tmr, message, pType)
+			return MateriaPrinter.printResponse(caller, tmr, message, pType)

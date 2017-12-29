@@ -26,11 +26,11 @@ class Repository :
   def find_tmr_by_name(self, name):
     client = MongoClient(self.REPO)
 
-    skill = client.ffbe.tmr.find_one({"name" : re.compile(name, re.IGNORECASE)})
-    if skill:
-      del skill['_id']
+    tmr = client.ffbe.tmr.find_one({"name" : re.compile(name, re.IGNORECASE)})
+    if tmr:
+      del tmr['_id']
 
-    return skill
+    return tmr
 
   def find_unit_by_name(self, name):
     client = MongoClient(self.REPO)
