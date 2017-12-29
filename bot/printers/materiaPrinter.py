@@ -1,15 +1,22 @@
-from equipmentPrinter import EquipmentPrinter
-from skillPrinter import SkillPrinter
+#from json import dumps
 
-# Mover a un archivo aparte
-class Printer:
-	pass
-
-class MateriaPrinter(Printer):
+class MateriaPrinter:
 
 	@classmethod
 	def printResponse(cls, caller, materia, message, pType = 'HTML'):
-		if materia['print_type'] == 'equipment':
-			return EquipmentPrinter.printResponse(caller, materia, message, pType)
-		else:
-			return SkillPrinter.printResponse(caller, materia, message, pType)
+		reponse = ''
+		for section in ['info']:
+			reponse += getattr(cls, section.lower() + pType)(materia)
+		return caller(message, reponse, parse_mode = pType)
+
+	@classmethod
+	def infoHTML(cls, materia):
+		return (
+			"<b>Name:</b> " + materia['name'] + "\n"
+			"<b>Description:</b> " + cls.formatDescription(materia) + "\n"
+			'<a href="https://exvius.gamepedia.com/' + materia['name'] + '">Wiki</a>'
+		)
+
+	@classmethod
+	def formatDescription(cls, materia):
+		return '.\n'.join(materia['effects']) + '.'
