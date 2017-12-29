@@ -53,7 +53,7 @@ def tmr(message):
   params = message.text.split(' ', 1)
   name = params[1].title()
   try :
-    printMateria(message, name)
+    printTmr(message, name)
   except Exception:
     log.error("Exception:", exc_info=True)
     bot.reply_to(message, "Materia name '" + name + "' not found")
@@ -74,8 +74,8 @@ def printUnit(message, name, sections):
   #log.info(unit, json=True)
   UnitPrinter.printResponse(bot.reply_to, unit, sections, message)
 
-def printMateria(message, materia_name):
-  materia = repo.find_materia_by_name(materia_name)
+def printTmr(message, materia_name):
+  materia = repo.find_tmr_by_name(materia_name)
   log.info(materia, json=True)
   TmrPrinter.printResponse(bot.reply_to, materia, message)
 
@@ -98,6 +98,7 @@ def checkAbreviations(name):
     'Tt' : 'Trance Terra',
     'Cod': 'Cloud of Darkness',
     'Dkc': 'Dark Knight Cecil',
+    'Lassworm': 'Lasswell',
   }
 
   return abreviations[name] if name in abreviations else name

@@ -6,34 +6,31 @@ class Repository :
   REPO = 'mongodb://localhost:27017/'
 
   def find_equipment_by_name(self, name, client = None):
-    if not client:
-      client = MongoClient(self.REPO)
+    client = MongoClient(self.REPO)
     
     equipment = client.ffbe.equipment.find_one({"name" : re.compile(name, re.IGNORECASE)})
     if equipment:
-      equipment['print_type'] = 'equipment'
       del equipment['_id']
 
     return equipment
 
-  def find_skill_by_name(self, name, client = None):
-    if not client:
-      client = MongoClient(self.REPO)
+  def find_materia_by_name(self, name, client = None):
+    client = MongoClient(self.REPO)
 
-    skill = client.ffbe.skills.find_one({"name" : re.compile(name, re.IGNORECASE)})
+    materia = client.ffbe.materia.find_one({"name" : re.compile(name, re.IGNORECASE)})
+    if materia:
+      del materia['_id']
+
+    return materia
+
+  def find_tmr_by_name(self, name):
+    client = MongoClient(self.REPO)
+
+    skill = client.ffbe.tmr.find_one({"name" : re.compile(name, re.IGNORECASE)})
     if skill:
-      skill['print_type'] = 'skill'
       del skill['_id']
 
     return skill
-
-  def find_materia_by_name(self, name):
-    client = MongoClient(self.REPO)
-    materia = self.find_skill_by_name(name, client)
-    if materia:
-      return materia
-    else:
-      return self.find_equipment_by_name(name, client)
 
   def find_unit_by_name(self, name):
     client = MongoClient(self.REPO)
