@@ -36,3 +36,16 @@ supervisor corre como root así que es necesario instalar las mismas librerías 
   
     pip install pyTelegramBotAPI
     pip install pymongo
+
+## Variables de entorno
+
+crear archivo env.sh (chmod +x env.sh)
+
+        #!/bin/bash
+        export TOKEN="token",
+        export DB_NAME="db",
+        export DB_URL="mongodb://----/"
+
+finalmente hacer 
+    
+    source env.sh (para agregarlas a la sesión)
