@@ -37,9 +37,9 @@ supervisor corre como root así que es necesario instalar las mismas librerías 
     pip install pyTelegramBotAPI
     pip install pymongo
 
-## Variables de entorno
+## Variables de entorno en ./env/
 
-crear archivo env.sh (chmod +x env.sh)
+crear archivo envvar.sh (chmod +x envvar.sh)
 
         #!/bin/bash
         export TOKEN="token",
@@ -49,3 +49,5 @@ crear archivo env.sh (chmod +x env.sh)
 finalmente hacer (para agregarlas a la sesión)
     
     source env.sh 
+
+### Para docker-compose, hacer un archivo similar sin export ni comillas

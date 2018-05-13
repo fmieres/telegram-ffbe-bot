@@ -12,3 +12,7 @@ COPY package.json package-lock.json ./
 RUN npm install
 
 COPY . /usr/src
+
+RUN chmod +x runme.sh
+
+CMD ["./runme.sh"]
