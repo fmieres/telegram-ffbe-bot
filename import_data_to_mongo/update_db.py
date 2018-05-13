@@ -1,4 +1,5 @@
 import json
+from os import environ
 from pymongo import MongoClient
 
 
@@ -29,7 +30,7 @@ def catch_exceptions(func):
 
 def create_connection():
     global DB_CLIENT
-    DB_CLIENT = MongoClient('localhost', 27017)
+    DB_CLIENT = MongoClient(environ['DB_URL'])
     print "Mongo DB - Connection Created"
 
 def close_connection():
