@@ -46,6 +46,6 @@ crear archivo env.sh (chmod +x env.sh)
         export DB_NAME="db",
         export DB_URL="mongodb://----/"
 
-finalmente hacer 
+finalmente hacer (para agregarlas a la sesión)
     
-    source env.sh (para agregarlas a la sesión)
+    source env.sh 
