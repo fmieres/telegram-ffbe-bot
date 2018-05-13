@@ -83,36 +83,68 @@ class Repository {
   find_unit_by_name(name){
     const query = collection => {
       return collection.aggregate([
-        {'$match': this._regex_query(name)},
+        { $match : this._regex_query(name)},
         
-        {'$unwind':"$skills"},
+        { $unwind : "$skills" },
         
         {
-          '$lookup': {
-            'from': 'skills', 
-            'localField': 'skills.id', 
-            'foreignField': 'id', 
-            'as': 'skill_info'
+          $lookup: {
+            from         : 'skills', 
+            localField   : 'skills.id', 
+            foreignField : 'id', 
+            as           : 'skill_info'
           }
         },
         
-        {'$unwind':"$skill_info"},
-        
-        {'$group':{
-            '_id': '$_id',
-            'id': {'$first':'$id'},
-            'name': {'$first':'$name'},
-            'names': {'$first':'$names'},
-            'skills': {
-                '$push': '$skill_info.name'
-            }
-        }}
+        { $unwind : "$skill_info" },
+
+        {
+          $group  :{
+            _id        : '$_id',
+            id         : { $first : '$id'},
+            name       : { $first : '$name'},
+            names      : { $first : '$names'},
+            entries    : { $first : '$entries' },
+            job        : { $first : '$job' },
+            game       : { $first : '$game' },
+            rarity_min : { $first : '$rarity_min' },
+            rarity_max : { $first : '$rarity_max' },
+            sex        : { $first : '$sex' },
+            skills     : { $push  : '$skill_info.name' }
+          }
+        },
+
+        {
+          $project : {
+            id          : true,
+            _id         : false,
+            name        : true,
+            names       : true,
+            skills      : true,
+            job         : true,
+            game        : true,
+            sex         : true,
+            rarity_min  : true,
+            rarity_max  : true,
+            stats : { 
+              $let : {
+                vars : {
+                  entry : {
+                    $arrayElemAt: [ { $objectToArray : '$entries' } , 0]}
+                },
+                in : "$$entry.v.stats"
+              }  
+            } 
+          }
+        }
+
       ])
       .toArray()
       .then( documents => 
         // por la forma de _regex_query , tenemos más opciones cuando se busca algo 
         // especifico, por eso ordeno los items por el que tienen el nombre más corto
         // y me quedo con el primero
+        // TODO : no es la mejor estrategia
         documents.sort( ({name},{name : name2}) => name.length - name2.length )[0]
       )
     }
@@ -123,4 +155,4 @@ class Repository {
 
 module.exports = Repository 
 
-// (new Repository()).find_unit_by_name('Rain').then(log)
+// (new Repository()).find_unit_by_name('seph').then(log)
