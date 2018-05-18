@@ -16,8 +16,8 @@ bot.on(/^\/help.*$/i, message => {
   return replier(message)('I am a ffbe info bot, available commands: unit_names, unit');
 })
 
-bot.on(/^\/unit\s+(f_sum|f_full)?(.+)$/i, (message, props) => {
-  const mode = props.match[1] || 'f_full'
+bot.on(/^\/unit\s+(\+)?(.+)$/i, (message, props) => {
+  const mode = props.match[1] === '+' ? true : false
   const identifier = props.match[2]
   const getter = name => repo.find_unit_by_name(name)
   return print(getter, UnitPrinter, replier(message), mode, identifier)
@@ -31,7 +31,7 @@ bot.on(/^\/unit\s+(f_sum|f_full)?(.+)$/i, (message, props) => {
 function print(getter, printer, replier, mode, identifier){
   return getter(identifier)
     .then( ({ value, suggestions }) => {
-      log(value)
+      // log(value)
       let message = ''
       if (!!value){
         message = printer.found(value, mode)

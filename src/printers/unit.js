@@ -1,9 +1,36 @@
 module.exports = { found, suggestions, not_found }
 
-function found(unit){
-  return main_formatter(unit) +
-    stats_formatter(unit.stats) +
-    skills_formatter(unit.skills)
+const
+  TYPE_ABILITY = 'ABILITY',
+  TYPE_MAGIC = 'MAGIC',
+  MAGIC_GREEN = 'Green',
+  MAGIC_WHITE = 'White',
+  MAGIC_BLACK = 'Black'
+;
+
+const emoji_magic_type = {
+  [MAGIC_GREEN] : '1f49a',
+  [MAGIC_WHITE] : '2b1c',
+  [MAGIC_BLACK] : '2b1b'
+}
+
+function discern_types({magics, abilities, pasives}, current){
+  const { type, active } = current
+  let accum = undefined;
+  if (type === TYPE_MAGIC){
+    accum = { magics : [...magics, current], abilities, pasives }
+  } else if ( active ){
+    accum = { magics, abilities : [...abilities, current], pasives }
+  } else {
+    accum = { magics, abilities, pasives : [...pasives, current] }
+  }
+  return accum;
+}
+
+function found(unit, is_full){
+  return main_formatter(unit,is_full) +
+    stats_formatter(unit.stats,is_full) +
+    skills_formatter( unit.skills.reduce( discern_types, { magics : [], abilities : [], pasives : [] }), is_full )
 }
 
 function suggestions(name, suggestions){
@@ -14,23 +41,30 @@ function not_found(name){
   return `unit ${name} not found`
 }
 
-function skills_formatter(skills = []){
-  return `  <b>Skills: </b>` + '\n' +
-    skills.map( name => `<code>  -</code><a href="https://exvius.gamepedia.com/${name}">${name}</a>` ).join('\n')
+function skills_formatter({ magics, abilities, pasives }, is_full){
+  const lam = (is_full, mp_cost, effects) => !is_full? '' : ` (${mp_cost}mp) ${effects}`
+  return '' +
+    ` <b>Magic:</b>` + '\n' +
+    magics.map( ({ name, magic_type, mp_cost, effects }) => 
+      `   &#x${emoji_magic_type[magic_type]} <a href="https://exvius.gamepedia.com/${name}">${name}</a>` + lam(is_full, mp_cost, effects) ).join('\n') + '\n' +
+    ` <b>Abilities:</b>` + '\n' +
+    abilities.map( ({ name, mp_cost, effects }) => 
+      `   <a href="https://exvius.gamepedia.com/${name}">${name}</a>` + lam(is_full, mp_cost, effects) ).join('\n') + '\n' +
+    ` <b>Pasives:</b>` + '\n' +
+    pasives.map( ({ name,effects }) => 
+      `   <a href="https://exvius.gamepedia.com/${name}">${name}</a> ${!is_full ? '' : effects}` ).join('\n')
 }
 
-function stats_formatter(stats){
-  console.log(stats)
-  return `  <b>Stats: </b> (at max lvl)` + '\n' +
+function stats_formatter(stats, is_full){
+  return !is_full ? '' : ` <b>Stats: </b> (at max lvl)` + '\n' +
     Object.keys(stats).map( key => {
       const [ _, base, pots ] = stats[key]
       const extraSpace = ['MP', 'HP'].includes(key) ? ' ' : ''
-      return `<code>  - ${key}${extraSpace} : ${base}(+${pots})</code>`
+      return `  <code>${key}${extraSpace} : ${base}(+${pots})</code>`
     }).join('\n') + '\n'
 }
 
-function main_formatter(unit){
+function main_formatter(unit, is_full){
   const { id, name, skills, sex, game, rarity_min, rarity_max, job, names, stats } = unit
-  return `<a href="https://exviusdb.com/static/img/assets/unit/unit_ills_${id}.png">&#xFE0F</a><a href="https://exvius.gamepedia.com/${name}">${name}</a> (${rarity_min}&#9734 - ${rarity_max}&#9734)
-  ${sex} ${game} ${job}` + '\n'
+  return `<a href="https://exviusdb.com/static/img/assets/unit/unit_ills_${id}.png">&#xFE0F</a><a href="https://exvius.gamepedia.com/${name}">${name}</a> (${rarity_min}&#9734 - ${rarity_max}&#9734)` + '\n' + (!is_full ? '' : ` ${sex} ${game} ${job}` + '\n')
 }
