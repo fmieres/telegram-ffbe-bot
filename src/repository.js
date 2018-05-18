@@ -110,7 +110,7 @@ class Repository {
             rarity_min : { $first : '$rarity_min' },
             rarity_max : { $first : '$rarity_max' },
             sex        : { $first : '$sex' },
-            skills     : { $push  : '$skill_info.name' }
+            skills     : { $push  : '$skill_info' }
           }
         },
 
