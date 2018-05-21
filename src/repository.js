@@ -8,7 +8,7 @@ const
   COLLECTION_EQUIPMENT  = 'equipment',
   COLLECTION_MATERIA    = 'materia',
   COLLECTION_TMR        = 'tmr',
-  COLLECTION_UNIT        = 'units',
+  COLLECTION_UNIT       = 'units',
   DB_NAME = ENV.DB_NAME,
   DB_URL  = ENV.DB_URL
 ;

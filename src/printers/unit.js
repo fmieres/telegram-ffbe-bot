@@ -9,7 +9,7 @@ const
 ;
 
 const emoji_magic_type = {
-  [MAGIC_GREEN] : '1f49a',
+  [MAGIC_GREEN] : '2733', //'1f49a',
   [MAGIC_WHITE] : '2b1c',
   [MAGIC_BLACK] : '2b1b'
 }
