@@ -1,6 +1,7 @@
 import json
 from os import environ
 from pymongo import MongoClient
+from pprint import pprint
 
 
 ################################
@@ -49,16 +50,19 @@ def update_collection(collection_name, relatedTask = lambda *args: None):
         
     return db_collection.insert_many(json_collection)
 
-def create_tmr_collection():
-    print "Mongo DB - Creating TMR Collection..."
+def update_tmr_collection():
+    print "Mongo DB - Updating TMR Collection..."
     DB = DB_CLIENT.ffbe
+
+    DB.tmr.remove()
+
     units_collection = DB.units
     units = units_collection.find();
 
     tmrs_collection = []
 
     for u in units:
-        if u['TMR']:
+        if ('TMR' in u) and u['TMR']:
             tmr_type = u['TMR'][0]
             tmr_id = u['TMR'][1]
             if tmr_type == 'EQUIP':
@@ -77,7 +81,7 @@ def update_collections():
     update_collection('materia')
     update_collection('equipment')
     update_collection('items')
-    create_tmr_collection()
+    update_tmr_collection()
 
 
 ################################
