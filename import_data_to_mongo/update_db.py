@@ -38,10 +38,9 @@ def close_connection():
     print "Mongo DB - Connection Closed"
     DB_CLIENT.close()
 
-def update_collection(collection_name, relatedTask = lambda *args: None):
+def update_collection(DB, collection_name, relatedTask = lambda *args: None):
     print "Mongo DB - Updating '%s' Collection..." % collection_name
-    db = DB_CLIENT.ffbe
-    db_collection = getattr(db, collection_name)
+    db_collection = getattr(DB, collection_name)
     db_collection.remove()
 
     json_collection = get_collection_data(collection_name)
@@ -50,9 +49,8 @@ def update_collection(collection_name, relatedTask = lambda *args: None):
         
     return db_collection.insert_many(json_collection)
 
-def update_tmr_collection():
+def update_tmr_collection(DB):
     print "Mongo DB - Updating TMR Collection..."
-    DB = DB_CLIENT.ffbe
 
     DB.tmr.remove()
 
@@ -66,9 +64,9 @@ def update_tmr_collection():
             tmr_type = u['TMR'][0]
             tmr_id = u['TMR'][1]
             if tmr_type == 'EQUIP':
-                tmr = DB_CLIENT.ffbe.equipment.find_one( {"id": tmr_id} )
+                tmr = DB.equipment.find_one( {"id": tmr_id} )
             else:
-                tmr = DB_CLIENT.ffbe.materia.find_one( {"id": tmr_id} )
+                tmr = DB.materia.find_one( {"id": tmr_id} )
             tmr['tmr_type'] = tmr_type
             tmrs_collection.append(tmr)
     
@@ -76,12 +74,14 @@ def update_tmr_collection():
 
 
 def update_collections():
-    update_collection('units')
-    update_collection('skills')
-    update_collection('materia')
-    update_collection('equipment')
-    update_collection('items')
-    update_tmr_collection()
+    DB_NAME = environ['DB_NAME']
+    DB = getattr(DB_CLIENT, DB_NAME)
+    update_collection(DB, 'units')
+    update_collection(DB, 'skills')
+    update_collection(DB, 'materia')
+    update_collection(DB, 'equipment')
+    update_collection(DB, 'items')
+    update_tmr_collection(DB)
 
 
 ################################
