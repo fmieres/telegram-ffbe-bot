@@ -19,9 +19,8 @@ bot.on(/^\/help.*$/i, message => {
 bot.on(/^\/unit\s+(\+)?(.+)$/i, (message, props) => {
   const mode = props.match[1] === '+' ? true : false
   const identifier = props.match[2]
-  const getter = identifier => {
-    repo.check_if_nickname(identifier).then( name => repo.find_unit_by_name(name) )
-  }
+  const getter = identifier => 
+    repo.check_if_nickname(identifier).then( ({value}) => repo.find_unit_by_name(value) )
   return print(getter, UnitPrinter, replier(message), mode, identifier)
 })
 

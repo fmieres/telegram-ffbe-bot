@@ -72,7 +72,7 @@ class Repository {
   check_if_nickname(identifier) {
     const lower_identifier = identifier.toLowerCase()
     const query = collection => {
-      return collection.findOne({name: lower_identifier}).then( 
+      return collection.findOne({nickname: lower_identifier}).then( 
         result => result ? result.name : identifier
       ) 
     }
