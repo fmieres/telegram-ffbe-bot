@@ -72,6 +72,37 @@ def update_tmr_collection(DB):
     
     DB.tmr.insert_many(tmrs_collection)
 
+def update_units_nicknames(DB):
+    print "Mongo DB - Updating Units Nicknames Collection..."
+
+    DB.units_nicknames.remove()
+
+    nicknames = {
+        'wol'       : 'Warrior of Light',
+        'vod'       : 'Veritas of the Dark',
+        'dv'        : 'Veritas of the Dark',
+        'vof'       : 'Veritas of the Flame',
+        'fv'        : 'Veritas of the Flame',
+        'voe'       : 'Veritas of the Earth',
+        'ev'        : 'Veritas of the Earth',
+        'vow'       : 'Veritas of the Waters',
+        'wv'        : 'Veritas of the Waters',
+        'vol'       : 'Veritas of the Light',
+        'lv'        : 'Veritas of the Light',
+        'voh'       : 'Veritas of the Heavens',
+        'hv'        : 'Veritas of the Heavens',
+        'wkn'       : 'White Knight Noel',
+        'tt'        : 'Trance Terra',
+        'cod'       : 'Cloud of Darkness',
+        'dkc'       : 'Dark Knight Cecil',
+        'lassworm'  : 'Lasswell',
+        'lassfool'  : 'Lasswell',
+    }
+
+    nicknames_collection = [{'nickname': nickname, 'name': name} for (nickname, name) in nicknames.items()]
+
+    DB.units_nicknames.insert_many(nicknames_collection)
+
 
 def update_collections():
     DB_NAME = environ['DB_NAME']
@@ -82,6 +113,7 @@ def update_collections():
     update_collection(DB, 'equipment')
     update_collection(DB, 'items')
     update_tmr_collection(DB)
+    update_units_nicknames(DB)
 
 
 ################################

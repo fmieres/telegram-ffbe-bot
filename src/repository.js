@@ -5,10 +5,11 @@ const
 ;
 
 const 
-  COLLECTION_EQUIPMENT  = 'equipment',
-  COLLECTION_MATERIA    = 'materia',
-  COLLECTION_TMR        = 'tmr',
-  COLLECTION_UNIT       = 'units',
+  COLLECTION_EQUIPMENT        = 'equipment',
+  COLLECTION_MATERIA          = 'materia',
+  COLLECTION_TMR              = 'tmr',
+  COLLECTION_UNIT             = 'units',
+  COLLECTION_UNITS_NICKNAMES  = 'units_nicknames',
   DB_NAME = ENV.DB_NAME,
   DB_URL  = ENV.DB_URL
 ;
@@ -66,6 +67,16 @@ class Repository {
   _remove_id(obj){
     if (!!obj) delete obj._id
     return obj
+  }
+
+  check_if_nickname(identifier) {
+    const lower_identifier = identifier.toLowerCase()
+    const query = collection => {
+      return collection.findOne({nickname: lower_identifier}).then( 
+        result => result ? result.name : identifier
+      ) 
+    }
+    return this._inner_query(query, COLLECTION_UNITS_NICKNAMES)
   }
   
   find_equipment_by_name(name) {
