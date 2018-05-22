@@ -142,8 +142,9 @@ class Repository {
             _id         : false,
             name        : true,
             names       : true,
-            tmr_type: true,
-            // tmr : true,
+            tmr : {
+              $cond : { if: { $gt: [ { $size : '$tmr'}, 0 ] } , then: { $arrayElemAt : [ '$tmr', 0 ] }, else : undefined }
+            },
             skills      : true,
             job         : true,
             game        : true,
@@ -178,6 +179,6 @@ class Repository {
 
 }
 
-// module.exports = Repository 
+module.exports = Repository 
 
-(new Repository()).find_unit_by_name('seph').then(log)
+// (new Repository()).find_unit_by_name('Seph').then(log)

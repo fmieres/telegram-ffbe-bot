@@ -1,3 +1,5 @@
+const TmrPrinter = require('./tmr')
+
 module.exports = { found, suggestions, not_found }
 
 const
@@ -28,7 +30,8 @@ function discern_types({magics, abilities, pasives}, current){
 }
 
 function found(unit, is_full){
-  return main_formatter(unit,is_full) +
+  return main_formatter(unit,is_full) + 
+    TmrPrinter.for_unit(unit.tmr, is_full) + 
     stats_formatter(unit.stats,is_full) +
     skills_formatter( unit.skills.reduce( discern_types, { magics : [], abilities : [], pasives : [] }), is_full )
 }
