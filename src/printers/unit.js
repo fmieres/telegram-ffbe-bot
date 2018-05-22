@@ -44,18 +44,35 @@ function not_found(name){
   return `unit ${name} not found`
 }
 
+
 function skills_formatter({ magics, abilities, pasives }, is_full){
-  const lam = (is_full, mp_cost, effects) => !is_full? '' : ` (${mp_cost}mp) ${effects}`
+  const add_mp_cost = (mp_cost, effects) => !is_full? '' : ` (${mp_cost}mp) ${effects}`
   return '' +
-    ` <b>Magic:</b>` + '\n' +
-    magics.map( ({ name, magic_type, mp_cost, effects }) => 
-      `   &#x${emoji_magic_type[magic_type]} <a href="https://exvius.gamepedia.com/${name}">${name}</a>` + lam(is_full, mp_cost, effects) ).join('\n') + '\n' +
-    ` <b>Abilities:</b>` + '\n' +
-    abilities.map( ({ name, mp_cost, effects }) => 
-      `   <a href="https://exvius.gamepedia.com/${name}">${name}</a>` + lam(is_full, mp_cost, effects) ).join('\n') + '\n' +
-    ` <b>Pasives:</b>` + '\n' +
+    (!!magics    && magics.length    > 0 ? print_magics(magics, add_mp_cost)       + '\n' : '') + 
+    (!!abilities && abilities.length > 0 ? print_abilities(abilities, add_mp_cost) + '\n' : '') + 
+    (!!pasives   && pasives.length   > 0 ? print_pasives(pasives, is_full)            : '')
+    
+    
+}
+
+function print_pasives(pasives, is_full){
+  return ` <b>Pasives:</b>` + '\n' +
     pasives.map( ({ name,effects }) => 
       `   <a href="https://exvius.gamepedia.com/${name}">${name}</a> ${!is_full ? '' : effects}` ).join('\n')
+}
+
+function print_abilities(abilities, add_mp_cost){
+  return ` <b>Abilities:</b>` + '\n' +
+    abilities.map( ({ name, mp_cost, effects }) => 
+      `   <a href="https://exvius.gamepedia.com/${name}">${name}</a>` +
+      add_mp_cost(mp_cost, effects) ).join('\n')
+}
+
+function print_magics(magics, add_mp_cost){
+  return ` <b>Magic:</b>` + '\n' +
+    magics.map( ({ name, magic_type, mp_cost, effects }) => 
+      `   &#x${emoji_magic_type[magic_type]} <a href="https://exvius.gamepedia.com/${name}">${name}</a>` +
+      add_mp_cost(mp_cost, effects) ).join('\n')
 }
 
 function stats_formatter(stats, is_full){
