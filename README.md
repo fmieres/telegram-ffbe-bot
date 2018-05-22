@@ -4,42 +4,9 @@
 
 Los datos son obtenidos de https://github.com/aEnigmatic/ffbe . 
 
-npm update + update_db.py actualiza mongo con los datos obtenidos del repo de aEnigmatic.
-
-
-## Bot
-
-### Instalación
-
-	pip install pyTelegramBotAPI
-
-### Uso
-    
-    python bot/main.py {TOKEN}
-    
-El token se solicita al admin
-
-## Supervisord
-
-```
-[program:telebot.ffbe]
-command=python main.py {TOKEN}
-process_name=%(program_name)s
-directory=/home/federico/develop/self/telegram_exvius_bot/bot/
-autostart=false
-autorestart=true
-stdout_logfile=/var/log/supervisor/telebot.ffbe.log
-stderr_logfile=/var/log/supervisor/telebot.fbbe-error.log
-```
-
-supervisor corre como root así que es necesario instalar las mismas librerías de pip como root
-  
-    pip install pyTelegramBotAPI
-    pip install pymongo
-
 ## Variables de entorno en env/
 
-crear archivo envvar.sh (chmod +x envvar.sh)
+crear archivo envvar.sh 
 
         #!/bin/bash
         export TOKEN="token"
@@ -50,4 +17,22 @@ finalmente hacer (para agregarlas a la sesión)
     
     source env.sh 
 
-### Para docker-compose, hacer un archivo similar sin export ni comillas llamado app.env
+#### Para docker-compose, hacer un archivo similar sin export ni comillas llamado app.env
+
+## docker-compose
+
+    docker build -t telegram-exvius-bot .
+
+para buildear la imagen de node con mongo
+
+    docker-compose up # -d
+
+para levantar el ambos db y app (-d para dejar como daemon)
+
+## update de db con nuevos datos
+
+    docker exec -it telegramexviusbot_app_1 sh
+
+una vez dentro correr el comando del container
+
+    python import_data_to_mongo/update_db.py
