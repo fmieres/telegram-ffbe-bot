@@ -123,7 +123,7 @@ class Repository {
             rarity_min : { $first : '$rarity_min' },
             rarity_max : { $first : '$rarity_max' },
             sex        : { $first : '$sex' },
-            skills     : { $push  : { skill:  '$skill_info', rarity : '$skills.rarity'} }
+            skills     : { $push  : { $mergeObjects : ['$skill_info', { unit_rarity : '$skills.rarity', unit_level : '$skills.level' }]} }
           }
         },
 
