@@ -13,14 +13,16 @@ function not_found(name){
 }
 
 function for_unit(tmr, is_full){
+  return print(tmr)
   return !!tmr 
-    ? ( is_full ? print_full(tmr) : print(tmr) ) 
+    // ? ( is_full ? print_full(tmr) : print(tmr) ) 
+    ? print(tmr)
     : ''
 }
 
 function print(tmr){
   const { name } = tmr
-  return ` <b>TMR</b>: <a href="https://exvius.gamepedia.com/${name}">${name}</a>` + '\n'
+  return ` <b>TMR</b>: <a href="https://exvius.gamepedia.com/${name}">${name}</a> (${tmr.tmr_type.toLowerCase()})` + '\n'
 }
 
 function materia_tmr(){

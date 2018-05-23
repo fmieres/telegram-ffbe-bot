@@ -21,57 +21,42 @@ bot.on(/^\/unit\s+(\+)?(.+)$/i, (message, props) => {
   const identifier = props.match[2]
   const getter = identifier => 
     repo.check_if_nickname(identifier).then( ({value}) => repo.find_unit_by_name(value) )
-  let replyMarkup = bot.inlineKeyboard([
-      [
-          bot.inlineButton('wiki', {url: 'https://exvius.gamepedia.com/Basch'})
-          ],[
-          // bot.inlineButton('wiki', {url: 'https://exvius.gamepedia.com/Basch'}),
-          bot.inlineButton('tmr', {callback: '/tmr schcuheon'})
-      ]
-  ]);
-  print(getter, UnitPrinter, replier(message, {replyMarkup}), mode, identifier)
+  
+  return process_unit(getter, UnitPrinter, replier(message), mode, identifier)
 
-
-  // return bot.sendMessage(message.chat.id, 'Inline keyboard example.', {replyMarkup});
-
-  // bot.sendMessage(msg.chat.id, example)
-  // return 
 })
-// On inline query
+
+
 bot.on('callbackQuery', msg => {
 
     let query = msg.query;
     log(msg)
-    // console.log(`inline query: ${ query }`);
 
 
 });
 
+function process_unit(getter, printer, replier, mode, identifier){
 
-// se propagan multiples matches; un mensaje conocido es uno desconocido también
-// bot.on(/\/.*/, message => {
-//   return replier(message)('Unrecognized command, try /help');
-// })
+  const markup = buttons => !!buttons 
+    ? bot.inlineKeyboard( [ ...buttons.map( ({title, content}) => [ bot.inlineButton(title, content)] ) ] )
+    : undefined
 
-function print(getter, printer, replier, mode, identifier){
   return getter(identifier)
     .then( ({ value, suggestions }) => {
-      //log(value)
-      let message = ''
       if (!!value){
-        message = printer.found(value, mode)
+        var { message, replyMarkup } = printer.found(value, mode, markup)
       } else if (suggestions.length > 0) {
-        message = printer.suggestions(identifier, suggestions)
+        var { message, replyMarkup } = printer.suggestions(identifier, suggestions, markup)
       } else {
-        message = printer.not_found(identifier)
+        var { message, replyMarkup } = printer.not_found(identifier, markup)
       }
-      return replier(message)
+      return replier(message, { replyMarkup })
     })
 }
 
-function replier(message, opt={}) {
+function replier(message) {
   return (text, extra_options = {}) => 
-    bot.sendMessage(message.chat.id, text, { parseMode : 'HTML', ...extra_options , ...opt})
+    bot.sendMessage(message.chat.id, text, { parseMode : 'HTML', ...extra_options })
 } 
 
 

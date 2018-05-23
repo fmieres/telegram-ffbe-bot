@@ -29,30 +29,37 @@ function discern_types({magics, abilities, pasives}, current){
   return accum;
 }
 
-function found(unit, is_full){
-  return main_formatter(unit,is_full) + 
+function found(unit, is_full, markup){
+  console.log('log: ', unit);
+  const message = main_formatter(unit,is_full) + 
     TmrPrinter.for_unit(unit.tmr, is_full) + 
     stats_formatter(unit.stats,is_full) +
     skills_formatter( unit.skills.reduce( discern_types, { magics : [], abilities : [], pasives : [] }), is_full )
+  const replyMarkup = markup([
+    ...[{ title : 'Gamepedia Link', content : { url : wikiLink(unit) } }],
+    ...(!!unit.tmr ? [{ title : 'Ask for TMR', content : { callback : `/tmr ${unit.tmr.name}` } }] : [])
+  ])
+  return { message, replyMarkup }
+}
+
+function wikiLink(object){
+  return `https://exvius.gamepedia.com/${object.name}`
 }
 
 function suggestions(name, suggestions){
-  return `unit ${name} not found, maybe you were looking for ...`
+  return { message : `unit ${name} not found, maybe you were looking for ...`, undefined}
 }
 
 function not_found(name){
-  return `unit ${name} not found`
+  return { message : `unit ${name} not found`, undefined}
 }
-
 
 function skills_formatter({ magics, abilities, pasives }, is_full){
   const add_mp_cost = (mp_cost, effects) => !is_full? '' : ` (${mp_cost}mp) ${effects}`
   return '' +
     (!!magics    && magics.length    > 0 ? print_magics(magics, add_mp_cost)       + '\n' : '') + 
     (!!abilities && abilities.length > 0 ? print_abilities(abilities, add_mp_cost) + '\n' : '') + 
-    (!!pasives   && pasives.length   > 0 ? print_pasives(pasives, is_full)            : '')
-    
-    
+    (!!pasives   && pasives.length   > 0 ? print_pasives(pasives, is_full)            : '')    
 }
 
 function print_pasives(pasives, is_full){
