@@ -1,7 +1,18 @@
+const 
+  { wikiLink } = require('../lib/utils')
+;
+
 module.exports = { found, suggestions, not_found, for_unit }
 
-function found(unit, is_full){
-  return ''
+function found(tmr, is_full, markup){
+  const message = print_full(tmr)
+
+  const replyMarkup = markup([
+    ...[{ title : 'Gamepedia Link', content : { url : wikiLink(tmr) } }]
+    /*,
+    ...(!!unit.tmr ? [{ title : 'Ask for TMR', content : { callback : `/tmr ${unit.tmr.name}` } }] : [])*/
+  ])
+  return { message, replyMarkup }
 }
 
 function suggestions(name, suggestions){

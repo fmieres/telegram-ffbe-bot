@@ -20,21 +20,22 @@ const
 ;
 
 // bot.on('tick', event => log(event, 'tick')) // esto quizás sirva para scheduled messages
- 
+
 bot.on(REGEX_COMMAND_HELP, message => replier(message)('I am a ffbe info bot, available commands: unit') )
 bot.on(REGEX_COMMAND_TMR, tmr)
 bot.on(REGEX_COMMAND_UNIT, unit)
 
 bot.on('callbackQuery', msg => {
-    let query = msg.query;
-    log(msg)
+  let query = msg.query;
+  log(msg)
 });
 
 bot.start()
 
 function tmr(message, props){
-  const identifier = props.match(1)
-  const getter = identifier => repo.find_unit_by_name(identifier)
+  log(props)
+  const identifier = props.match[1]
+  const getter = identifier => repo.find_tmr_by_name(identifier)
   return process_unit(getter, TMRPrinter, replier(message), false, identifier)
 }
 
@@ -53,7 +54,7 @@ function process_unit(getter, printer, replier, mode, identifier){
     : undefined
 
   return getter(identifier)
-    .then( ({ value, suggestions }) => {
+    .then(log).then( ({ value, suggestions }) => {
       if (!!value){
         var { message, replyMarkup } = printer.found(value, mode, markup)
       } else if (suggestions.length > 0) {

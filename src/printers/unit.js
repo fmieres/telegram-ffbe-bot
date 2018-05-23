@@ -1,4 +1,8 @@
-const TmrPrinter = require('./tmr')
+const 
+  { wikiLink } = require('../lib/utils'),
+  TmrPrinter = require('./tmr')
+;
+
 
 module.exports = { found, suggestions, not_found }
 
@@ -40,10 +44,6 @@ function found(unit, is_full, markup){
     ...(!!unit.tmr ? [{ title : 'Ask for TMR', content : { callback : `/tmr ${unit.tmr.name}` } }] : [])
   ])
   return { message, replyMarkup }
-}
-
-function wikiLink(object){
-  return `https://exvius.gamepedia.com/${object.name}`
 }
 
 function suggestions(name, suggestions){
