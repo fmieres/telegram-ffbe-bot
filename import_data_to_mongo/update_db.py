@@ -68,6 +68,7 @@ def update_tmr_collection(DB):
             else:
                 tmr = DB.materia.find_one( {"id": tmr_id} )
             tmr['tmr_type'] = tmr_type
+            tmr['unit_name'] = u['name']
             tmrs_collection.append(tmr)
     
     DB.tmr.insert_many(tmrs_collection)
