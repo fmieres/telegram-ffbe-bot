@@ -47,11 +47,11 @@ function wikiLink(object){
 }
 
 function suggestions(name, suggestions){
-  return { message : `unit ${name} not found, maybe you were looking for ...`, undefined}
+  return { message : `unit ${name} not found, maybe you were looking for ...` }
 }
 
 function not_found(name){
-  return { message : `unit ${name} not found`, undefined}
+  return { message : `unit ${name} not found` }
 }
 
 function skills_formatter({ magics, abilities, pasives }, is_full){

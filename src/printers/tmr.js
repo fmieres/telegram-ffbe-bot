@@ -5,7 +5,7 @@ function found(unit, is_full){
 }
 
 function suggestions(name, suggestions){
-  return `tmr ${name} not found, maybe you were looking for ...`
+  return { message : `tmr ${name} not found, maybe you were looking for ...`, }
 }
 
 function not_found(name){
@@ -13,7 +13,7 @@ function not_found(name){
 }
 
 function for_unit(tmr, is_full){
-  return print(tmr)
+  // return print(tmr)
   return !!tmr 
     // ? ( is_full ? print_full(tmr) : print(tmr) ) 
     ? print(tmr)

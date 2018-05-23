@@ -1,42 +1,53 @@
 const 
   Repository = require('./repository'),
   UnitPrinter = require('./printers/unit'),
+  TMRPrinter = require('./printers/tmr'),
   ENV = require('../env'),
   TeleBot = require('telebot'),
   { log } = require('./lib/utils')
 ;
 
-const TOKEN = ENV.TOKEN
-const repo = new Repository()
-const bot = new TeleBot( TOKEN )
+const
+  TOKEN = ENV.TOKEN
+  repo = new Repository(),
+  bot = new TeleBot( TOKEN )
+;
+
+const
+  REGEX_COMMAND_UNIT = /^\/unit\s+(\+)?(.+)$/i,
+  REGEX_COMMAND_TMR = /^\/tmr\s+(.+)$/i,
+  REGEX_COMMAND_HELP = /^\/help.*$/i
+;
 
 // bot.on('tick', event => log(event, 'tick')) // esto quizás sirva para scheduled messages
-// 
-bot.on(/^\/help.*$/i, message => {
-  return replier(message)('I am a ffbe info bot, available commands: unit');
-})
+ 
+bot.on(REGEX_COMMAND_HELP, message => replier(message)('I am a ffbe info bot, available commands: unit') )
+bot.on(REGEX_COMMAND_TMR, tmr)
+bot.on(REGEX_COMMAND_UNIT, unit)
 
-bot.on(/^\/unit\s+(\+)?(.+)$/i, (message, props) => {
+bot.on('callbackQuery', msg => {
+    let query = msg.query;
+    log(msg)
+});
+
+bot.start()
+
+function tmr(message, props){
+  const identifier = props.match(1)
+  const getter = identifier => repo.find_unit_by_name(identifier)
+  return process_unit(getter, TMRPrinter, replier(message), false, identifier)
+}
+
+function unit (message, props) {
   const mode = props.match[1] === '+' ? true : false
   const identifier = props.match[2]
   const getter = identifier => 
     repo.check_if_nickname(identifier).then( ({value}) => repo.find_unit_by_name(value) )
   
   return process_unit(getter, UnitPrinter, replier(message), mode, identifier)
-
-})
-
-
-bot.on('callbackQuery', msg => {
-
-    let query = msg.query;
-    log(msg)
-
-
-});
+}
 
 function process_unit(getter, printer, replier, mode, identifier){
-
   const markup = buttons => !!buttons 
     ? bot.inlineKeyboard( [ ...buttons.map( ({title, content}) => [ bot.inlineButton(title, content)] ) ] )
     : undefined
@@ -59,5 +70,3 @@ function replier(message) {
     bot.sendMessage(message.chat.id, text, { parseMode : 'HTML', ...extra_options })
 } 
 
-
-bot.start()
