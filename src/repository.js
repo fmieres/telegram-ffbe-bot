@@ -112,6 +112,8 @@ class Repository {
         {
           $group  :{
             _id        : '$_id',
+            tmr_type   : { $first : { $arrayElemAt: [ '$TMR' , 0] } },
+            tmr_id     : { $first : { $arrayElemAt: [ '$TMR' , 1] } },
             id         : { $first : '$id'},
             name       : { $first : '$name'},
             names      : { $first : '$names'},
@@ -121,7 +123,16 @@ class Repository {
             rarity_min : { $first : '$rarity_min' },
             rarity_max : { $first : '$rarity_max' },
             sex        : { $first : '$sex' },
-            skills     : { $push  : '$skill_info' }
+            skills     : { $push  : { $mergeObjects : ['$skill_info', { unit_rarity : '$skills.rarity', unit_level : '$skills.level' }]} }
+          }
+        },
+
+        {
+          $lookup : {
+            from         : 'tmr',
+            localField   : 'tmr_id',
+            foreignField : 'id',
+            as           : 'tmr',
           }
         },
 
@@ -131,6 +142,9 @@ class Repository {
             _id         : false,
             name        : true,
             names       : true,
+            tmr : {
+              $cond : { if: { $gt: [ { $size : '$tmr'}, 0 ] } , then: { $arrayElemAt : [ '$tmr', 0 ] }, else : undefined }
+            },
             skills      : true,
             job         : true,
             game        : true,
@@ -141,7 +155,8 @@ class Repository {
               $let : {
                 vars : {
                   entry : {
-                    $arrayElemAt: [ { $objectToArray : '$entries' } , 0]}
+                    $arrayElemAt: [ { $objectToArray : '$entries' } , 0]
+                  }
                 },
                 in : "$$entry.v.stats"
               }  
@@ -166,4 +181,4 @@ class Repository {
 
 module.exports = Repository 
 
-// (new Repository()).find_unit_by_name('seph').then(log)
+// (new Repository()).find_unit_by_name('Seph').then(log)
