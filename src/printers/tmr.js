@@ -1,16 +1,14 @@
 const 
-  { wikiLink } = require('../lib/utils')
+  { wikiLink, log } = require('../lib/utils')
 ;
 
 module.exports = { found, suggestions, not_found, for_unit }
 
 function found(tmr, is_full, markup){
   const message = print_full(tmr)
-
   const replyMarkup = markup([
-    ...[{ title : 'Gamepedia Link', content : { url : wikiLink(tmr) } }]
-    /*,
-    ...(!!unit.tmr ? [{ title : 'Ask for TMR', content : { callback : `/tmr ${unit.tmr.name}` } }] : [])*/
+    ...[{ title : 'Gamepedia Link', content : { url : wikiLink(tmr) } }],
+    { title : 'Ask for Unit', content : { callback : `/unit ${tmr.unit_name}` } }
   ])
   return { message, replyMarkup }
 }
@@ -24,9 +22,7 @@ function not_found(name){
 }
 
 function for_unit(tmr, is_full){
-  // return print(tmr)
   return !!tmr 
-    // ? ( is_full ? print_full(tmr) : print(tmr) ) 
     ? print(tmr)
     : ''
 }

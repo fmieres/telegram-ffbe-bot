@@ -62,7 +62,7 @@ function process_unit(getter, printer, replier, mode, identifier){
       } else {
         var { message, replyMarkup } = printer.not_found(identifier, markup)
       }
-      return replier(message, { replyMarkup })
+      return replier(message, { /*replyMarkup*/ })
     })
 }
 
