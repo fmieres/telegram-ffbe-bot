@@ -43,7 +43,9 @@ function unit (message, props) {
   const mode = props.match[1] === '+' ? true : false
   const identifier = props.match[2]
   const getter = identifier => 
-    repo.check_if_nickname(identifier).then( ({value}) => repo.find_unit_by_name(value) )
+    repo.check_if_nickname(identifier).then(
+      ({value}) => repo.find_unit_by_name(value)
+    )
   
   return process_unit(getter, UnitPrinter, replier(message), mode, identifier)
 }
