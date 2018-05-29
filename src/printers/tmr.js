@@ -7,7 +7,7 @@ module.exports = { found, suggestions, not_found, for_unit }
 function found(tmr, is_full, markup){
   const message = print_full(tmr)
   const replyMarkup = markup([
-    ...[{ title : 'Gamepedia Link', content : { url : wikiLink(tmr) } }],
+    { title : 'Gamepedia Link', content : { url : wikiLink(tmr) } },
     { title : 'Ask for Unit', content : { callback : `/unit ${tmr.unit_name}` } }
   ])
   return { message, replyMarkup }

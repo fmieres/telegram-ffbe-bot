@@ -87,8 +87,75 @@ class Repository {
     return this._inner_query(this._simple_query_regex(name), COLLECTION_MATERIA)
   }
 
-  find_tmr_by_name(name){
+  find_tmr_by_name_simple(name){
     return this._inner_query(this._simple_query_regex(name), COLLECTION_TMR, )
+  }
+
+  find_tmr_by_name(name){
+    const query = collection => {
+      return collection.aggregate([
+        { $match : this._regex_query(name)},
+        
+        { $unwind : "$skills" },
+        
+        {
+          $lookup: {
+            from         : 'skills', 
+            localField   : 'skills', 
+            foreignField : 'id', 
+            as           : 'skill_info'
+          }
+        },
+        
+        { $unwind : "$skill_info" },
+
+        {
+          $group  :{
+            _id        : '$_id',
+            tmr_type   : { $first : '$tmr_type' },
+            skills     : { $push  : '$skill_info' }
+          }
+        }
+
+        // {
+        //   $project : {
+        //     id          : true,
+        //     _id         : false,
+        //     name        : true,
+        //     names       : true,
+        //     tmr : {
+        //       $cond : { if: { $gt: [ { $size : '$tmr'}, 0 ] } , then: { $arrayElemAt : [ '$tmr', 0 ] }, else : undefined }
+        //     },
+        //     skills      : true,
+        //     job         : true,
+        //     game        : true,
+        //     sex         : true,
+        //     rarity_min  : true,
+        //     rarity_max  : true,
+        //     stats : { 
+        //       $let : {
+        //         vars : {
+        //           entry : {
+        //             $arrayElemAt: [ { $objectToArray : '$entries' } , 0]
+        //           }
+        //         },
+        //         in : "$$entry.v.stats"
+        //       }  
+        //     } 
+        //   }
+        // }
+
+      ])
+      .toArray()
+      .then( documents => 
+        // por la forma de _regex_query , tenemos más opciones cuando se busca algo 
+        // especifico, por eso ordeno los items por el que tienen el nombre más corto
+        // y me quedo con el primero
+        // TODO : no es la mejor estrategia
+        documents.sort( ({name},{name : name2}) => name.length - name2.length )[0]
+      )
+    }
+    return this._inner_query(query, COLLECTION_TMR)
   }
 
   find_unit_by_name(name){
@@ -179,6 +246,8 @@ class Repository {
 
 }
 
-module.exports = Repository 
+// module.exports = Repository `
 
 // (new Repository()).find_unit_by_name('Seph').then(log)
+// 
+(new Repository()).find_tmr_by_name('Rikku').then(log)
