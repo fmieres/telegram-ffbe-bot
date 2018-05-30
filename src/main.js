@@ -31,7 +31,6 @@ bot.start()
 
 function callbackQuery(msg){
   const { data } = msg
-  log(msg)
   let callback = x => x
   let match = {}
   if (match = data.match(REGEX_COMMAND_UNIT)){
@@ -50,8 +49,6 @@ function tmr(message, props){
 }
 
 function unit (message, props) {
-  log(message)
-  log(props)
   const mode = props.match[1] === '+' ? true : false
   const identifier = props.match[2]
   const getter = identifier => 
@@ -68,7 +65,7 @@ function process_unit(getter, printer, replier, mode, identifier){
     : undefined
 
   return getter(identifier)
-    /*.then(log)*/.then( ({ value, suggestions }) => {
+    .then(log).then( ({ value, suggestions }) => {
       if (!!value){
         var { message, replyMarkup } = printer.found(value, mode, markup)
       } else if (suggestions.length > 0) {
