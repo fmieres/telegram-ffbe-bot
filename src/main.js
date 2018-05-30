@@ -25,21 +25,33 @@ bot.on(REGEX_COMMAND_HELP, message => replier(message)('I am a ffbe info bot, av
 bot.on(REGEX_COMMAND_TMR, tmr)
 bot.on(REGEX_COMMAND_UNIT, unit)
 
-bot.on('callbackQuery', msg => {
-  let query = msg.query;
-  log(msg)
-});
+bot.on('callbackQuery', callbackQuery);
 
 bot.start()
 
+function callbackQuery(msg){
+  const { data } = msg
+  log(msg)
+  let callback = x => x
+  let match = {}
+  if (match = data.match(REGEX_COMMAND_UNIT)){
+    callback = _ => unit(msg.message, { type: 'command', match })
+  } else if (match = data.match(REGEX_COMMAND_TMR)){
+    callback = _ => tmr(msg.message, { type: 'command', match })
+  }
+
+  callback()
+}
+
 function tmr(message, props){
-  log(props)
   const identifier = props.match[1]
   const getter = identifier => repo.find_tmr_by_name(identifier)
   return process_unit(getter, TMRPrinter, replier(message), false, identifier)
 }
 
 function unit (message, props) {
+  log(message)
+  log(props)
   const mode = props.match[1] === '+' ? true : false
   const identifier = props.match[2]
   const getter = identifier => 
@@ -56,7 +68,7 @@ function process_unit(getter, printer, replier, mode, identifier){
     : undefined
 
   return getter(identifier)
-    .then(log).then( ({ value, suggestions }) => {
+    /*.then(log)*/.then( ({ value, suggestions }) => {
       if (!!value){
         var { message, replyMarkup } = printer.found(value, mode, markup)
       } else if (suggestions.length > 0) {
@@ -64,7 +76,7 @@ function process_unit(getter, printer, replier, mode, identifier){
       } else {
         var { message, replyMarkup } = printer.not_found(identifier, markup)
       }
-      return replier(message, { /*replyMarkup*/ })
+      return replier(message, { replyMarkup })
     })
 }
 

@@ -91,73 +91,6 @@ class Repository {
     return this._inner_query(this._simple_query_regex(name), COLLECTION_TMR, )
   }
 
-  find_tmr_by_name(name){
-    const query = collection => {
-      return collection.aggregate([
-        { $match : this._regex_query(name)},
-        
-        { $unwind : "$skills" },
-        
-        {
-          $lookup: {
-            from         : 'skills', 
-            localField   : 'skills', 
-            foreignField : 'id', 
-            as           : 'skill_info'
-          }
-        },
-        
-        { $unwind : "$skill_info" },
-
-        {
-          $group  :{
-            _id        : '$_id',
-            tmr_type   : { $first : '$tmr_type' },
-            skills     : { $push  : '$skill_info' }
-          }
-        }
-
-        // {
-        //   $project : {
-        //     id          : true,
-        //     _id         : false,
-        //     name        : true,
-        //     names       : true,
-        //     tmr : {
-        //       $cond : { if: { $gt: [ { $size : '$tmr'}, 0 ] } , then: { $arrayElemAt : [ '$tmr', 0 ] }, else : undefined }
-        //     },
-        //     skills      : true,
-        //     job         : true,
-        //     game        : true,
-        //     sex         : true,
-        //     rarity_min  : true,
-        //     rarity_max  : true,
-        //     stats : { 
-        //       $let : {
-        //         vars : {
-        //           entry : {
-        //             $arrayElemAt: [ { $objectToArray : '$entries' } , 0]
-        //           }
-        //         },
-        //         in : "$$entry.v.stats"
-        //       }  
-        //     } 
-        //   }
-        // }
-
-      ])
-      .toArray()
-      .then( documents => 
-        // por la forma de _regex_query , tenemos más opciones cuando se busca algo 
-        // especifico, por eso ordeno los items por el que tienen el nombre más corto
-        // y me quedo con el primero
-        // TODO : no es la mejor estrategia
-        documents.sort( ({name},{name : name2}) => name.length - name2.length )[0]
-      )
-    }
-    return this._inner_query(query, COLLECTION_TMR)
-  }
-
   find_unit_by_name(name){
     const query = collection => {
       return collection.aggregate([
@@ -233,21 +166,89 @@ class Repository {
 
       ])
       .toArray()
-      .then( documents => 
-        // por la forma de _regex_query , tenemos más opciones cuando se busca algo 
-        // especifico, por eso ordeno los items por el que tienen el nombre más corto
-        // y me quedo con el primero
-        // TODO : no es la mejor estrategia
-        documents.sort( ({name},{name : name2}) => name.length - name2.length )[0]
-      )
+      .then( get_correct_entry_from_collection )
     }
     return this._inner_query(query, COLLECTION_UNIT)
   }
 
+  find_tmr_by_name(name){
+    const query = collection => {
+      return collection.aggregate([
+        { $match : this._regex_query(name)},
+        
+        { 
+          $unwind : {
+            path : "$skills",
+            preserveNullAndEmptyArrays: true
+          } 
+        },
+        
+        {
+          $lookup: {
+            from         : 'skills', 
+            localField   : 'skills', 
+            foreignField : 'id', 
+            as           : 'skill_info'
+          }
+        },
+        
+        {
+          $unwind :{
+            path : "$skill_info",
+            preserveNullAndEmptyArrays : true
+          }
+        },
+
+        {
+          $group  :{
+            _id               : '$_id',
+            unit_name         : { $first : '$unit_name' },
+            unit_restriction  : { $first : '$unit_restriction' },
+            unique            : { $first : '$unique' },
+            stats             : { $first : '$stats' },
+            effects           : { $first : '$effects' },
+            type              : { $first : '$type'  },
+            is_twohanded      : { $first : '$is_twohanded' },
+            accuracy          : { $first : '$accuracy' },
+            slot              : { $first : '$slot' },
+            requirements      : { $first : '$requirements' },
+            dmg_variance      : { $first : '$dmg_variance' },
+            icon              : { $first : '$icon' },
+            name              : { $first : '$name' },
+            tmr_type          : { $first : '$tmr_type' },
+            skills            : { $push  : '$skill_info' }
+          }
+        },
+
+        {
+          $project : {
+            _id : false, 
+          }
+        }
+
+      ])
+      .toArray()
+      .then( get_correct_entry_from_collection )
+    }
+    return this._inner_query(query, COLLECTION_TMR)
+  }
+
 }
 
-// module.exports = Repository `
+
+/**
+* por la forma de _regex_query , tenemos más opciones cuando se busca algo 
+* especifico, por eso ordeno los items por el que tienen el nombre más corto
+* y me quedo con el primero
+* TODO : no es la mejor estrategia
+*/
+function get_correct_entry_from_collection(documents){
+  return documents.sort( ({name},{name : name2}) => name.length - name2.length )[0]
+}
+
+module.exports = Repository
 
 // (new Repository()).find_unit_by_name('Seph').then(log)
 // 
-(new Repository()).find_tmr_by_name('Rikku').then(log)
+// (new Repository()).find_tmr_by_name('Rikku').then(log)
+// (new Repository()).find_tmr_by_name('Minerva').then(log)

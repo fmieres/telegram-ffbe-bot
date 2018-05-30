@@ -1,5 +1,5 @@
 const 
-  { wikiLink } = require('../lib/utils'),
+  { wikiLink, log } = require('../lib/utils'),
   TmrPrinter = require('./tmr')
 ;
 
@@ -34,14 +34,14 @@ function discern_types({magics, abilities, pasives}, current){
 }
 
 function found(unit, is_full, markup){
-  console.log('log: ', unit);
+  // log(unit);
   const message = main_formatter(unit,is_full) + 
     TmrPrinter.for_unit(unit.tmr, is_full) + 
     stats_formatter(unit.stats,is_full) +
     skills_formatter( unit.skills.reduce( discern_types, { magics : [], abilities : [], pasives : [] }), is_full )
   const replyMarkup = markup([
     ...[{ title : 'Gamepedia Link', content : { url : wikiLink(unit) } }],
-    ...(!!unit.tmr ? [{ title : 'Ask for TMR', content : { callback : `/tmr ${unit.tmr.name}` } }] : [])
+    ...(!!unit.tmr ? [{ title : `Ask for TMR : ${unit.tmr.name} `, content : { callback : `/tmr ${unit.tmr.name}` } }] : [])
   ])
   return { message, replyMarkup }
 }
