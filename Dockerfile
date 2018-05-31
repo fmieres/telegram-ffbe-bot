@@ -13,6 +13,8 @@ RUN npm install
 
 COPY . /usr/src
 
+RUN npm update data
+
 RUN chmod +x runme.sh
 
 CMD ["./runme.sh"]
