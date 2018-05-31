@@ -34,14 +34,16 @@ function discern_types({magics, abilities, pasives}, current){
 }
 
 function found(unit, is_full, markup){
-  // log(unit);
   const message = main_formatter(unit,is_full) + 
     TmrPrinter.for_unit(unit.tmr, is_full) + 
     stats_formatter(unit.stats,is_full) +
     skills_formatter( unit.skills.reduce( discern_types, { magics : [], abilities : [], pasives : [] }), is_full )
   const replyMarkup = markup([
     ...[{ title : 'Gamepedia Link', content : { url : wikiLink(unit) } }],
-    ...(!!unit.tmr ? [{ title : `Ask for TMR : ${unit.tmr.name} `, content : { callback : `/tmr ${unit.tmr.name}` } }] : [])
+    ...(!!unit.tmr ? [{ title : `View TMR : ${unit.tmr.name} `, content : { callback : `/tmr ${unit.tmr.name}` } }] : []),
+    !!is_full 
+      ? { title : `View Simple Description`, content : { callback : `/unit ${unit.name}` } } 
+      : { title : `View Full Description`, content : { callback : `/unit + ${unit.name}` } }
   ])
   return { message, replyMarkup }
 }

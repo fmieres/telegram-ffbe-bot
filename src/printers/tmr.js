@@ -8,7 +8,7 @@ function found(tmr, is_full, markup){
   const message = print_full(tmr)
   const replyMarkup = markup([
     { title : 'Gamepedia Link', content : { url : wikiLink(tmr) } },
-    { title : `Ask for Unit: ${tmr.unit_name}`, content : { callback : `/unit ${tmr.unit_name}` } }
+    { title : `View Related Unit: ${tmr.unit_name}`, content : { callback : `/unit ${tmr.unit_name}` } }
   ])
   return { message, replyMarkup }
 }
@@ -89,10 +89,16 @@ const tmr_type_print = {
 
 function print_full(tmr){
   const { name, type, unique, is_twohanded } = tmr
-  // return `<b>${name}</b>: `
-  return `<b>${name}</b>: (${tmr.tmr_type}) ${unique? '(unstackable)' : ''} ` + '\n' +
-  ` ${ is_twohanded? 'Two Handed ' : '' }${type? type : ''}` +  '\n' +
+  return format_name(tmr) + '\n' +
     tmr_type_print[tmr.tmr_type.toLowerCase()](tmr)
+}
+
+function format_name({name, tmr_type, unique, is_twohanded, type}){
+  const tmr_type_format = {
+    equip   : _ => `${ is_twohanded? 'Two Handed ' : '' }${type}`,
+    materia : _ => 'Materia'
+  }
+  return `<b>${name}</b>: ${tmr_type_format[tmr_type.toLowerCase()]()} ${unique? '(unstackable)' : ''}`
 }
 
 const main_stats = ['ATK', 'DEF', 'SPR', 'MAG', 'MP', 'HP']
