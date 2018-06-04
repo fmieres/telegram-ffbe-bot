@@ -16,14 +16,18 @@ const
 const
   REGEX_COMMAND_UNIT = /^\/unit\s+(\+)?(.+)$/i,
   REGEX_COMMAND_TMR = /^\/tmr\s+(.+)$/i,
-  REGEX_COMMAND_HELP = /^\/help.*$/i
+  REGEX_COMMAND_HELP = /^\/help.*$/i,
+  REGEX_COMMAND_SUB = /^\/sub\s+(.+)$/i,
+  REGEX_COMMAND_UNSUB = /^\/unsub\s+(.+)$/i
 ;
 
-// bot.on('tick', event => log(event, 'tick')) // esto quizás sirva para scheduled messages
+//bot.on('tick', event => log(event, 'tick')) // esto quizás sirva para scheduled messages
 
 bot.on(REGEX_COMMAND_HELP, message => replier(message)('I am a ffbe info bot, available commands: unit') )
 bot.on(REGEX_COMMAND_TMR, tmr)
 bot.on(REGEX_COMMAND_UNIT, unit)
+bot.on(REGEX_COMMAND_SUB, sub)
+bot.on(REGEX_COMMAND_UNSUB, unsub)
 
 bot.on('callbackQuery', callbackQuery);
 
@@ -48,7 +52,21 @@ function tmr(message, props){
   return process_unit(getter, TMRPrinter, replier(message), false, identifier)
 }
 
-function unit (message, props) {
+function sub(message, props){
+  const identifier = props.match[1];
+  repo.create_subscription(message.chat.id, identifier, -3).then(
+    result => bot.sendMessage(message.chat.id, result, { parseMode : 'HTML' })
+  );
+}
+
+function unsub(message, props){
+  const identifier = props.match[1];
+  repo.remove_subscription(message.chat.id, identifier).then(
+    result => bot.sendMessage(message.chat.id, result, { parseMode : 'HTML' })
+  );
+}
+
+function unit(message, props) {
   const mode = props.match[1] === '+' ? true : false
   const identifier = props.match[2]
   const getter = identifier => 

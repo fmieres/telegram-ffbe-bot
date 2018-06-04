@@ -53,8 +53,10 @@ function format_period(regex_match, timezone){
   const end = dates[1] + ' 2018 ' + regex_match[2]; // Thursday 5/31 5:00
 
   let start_date = new Date(start);
-  start_date.setHours(start_date.getHours() + timezone);
   let end_date = new Date(end);
+
+  // TODO: Esto moverlo al tick, para mandar cada mensaje
+  start_date.setHours(start_date.getHours() + timezone);
   end_date.setHours(end_date.getHours() + timezone);
 
   return {start: start_date, end: end_date};

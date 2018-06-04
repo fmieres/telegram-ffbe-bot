@@ -10,8 +10,10 @@ const
   COLLECTION_TMR              = 'tmr',
   COLLECTION_UNIT             = 'units',
   COLLECTION_UNITS_NICKNAMES  = 'units_nicknames',
+  COLLECTION_SUBSCRIPTIONS    = 'subscriptions',
   DB_NAME = ENV.DB_NAME,
-  DB_URL  = ENV.DB_URL
+  DB_URL  = ENV.DB_URL,
+  SUBSCRIPTIONS = ['maintenance']
 ;
 
 class Repository {
@@ -77,6 +79,56 @@ class Repository {
       ) 
     }
     return this._inner_query(query, COLLECTION_UNITS_NICKNAMES)
+  }
+
+  create_subscription(chat_id, event, timezone) {
+    const formatted_event = event.toLowerCase();
+    if (SUBSCRIPTIONS.includes(formatted_event)) {
+      const query = collection => {
+        const sub = {
+          chat_id: chat_id,
+          event: formatted_event,
+          timezone: timezone
+        };
+
+        return collection.update({chat_id: chat_id, event: event}, sub, { upsert: true }).then(
+          result => formatted_event,
+          error => console.log(error)
+        );
+      };
+
+      return this._inner_query(query, COLLECTION_SUBSCRIPTIONS).then(
+        ({value}) => "Subscribed this chat to the '" + value + "' event",
+        ({value}) => 'There was a problem with your subscription. Try again later'
+      );
+
+    } else {
+      return new Promise((accept, reject) => {
+        accept('The specified event does not exist');
+      });
+    }
+  }
+
+  remove_subscription(chat_id, event) {
+    const formatted_event = event.toLowerCase();
+    if (SUBSCRIPTIONS.includes(formatted_event)) {
+      const query = collection => {
+        return collection.remove({chat_id: chat_id, event: event}).then(
+          result => formatted_event,
+          error => console.log(error)
+        );
+      };
+
+      return this._inner_query(query, COLLECTION_SUBSCRIPTIONS).then(
+        ({value}) => "Removed this chat from the '" + value + "' event",
+        ({value}) => 'There was a problem with your subscription removal. Try again later'
+      );
+
+    } else {
+      return new Promise((accept, reject) => {
+        accept('The specified event does not exist');
+      });
+    }
   }
   
   find_equipment_by_name(name) {
