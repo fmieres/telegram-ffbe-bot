@@ -108,10 +108,22 @@ def update_units_nicknames(DB):
         'cg nichol'   : 'Maritime Strategist Nichol',
     }
 
-    nicknames_collection = [{'nickname': nickname, 'name': name} for (nickname, name) in nicknames.items()]
+    nicknames_list = [{'nickname': nickname, 'name': name} for (nickname, name) in nicknames.items()]
 
-    DB.units_nicknames.insert_many(nicknames_collection)
+    DB.units_nicknames.insert_many(nicknames_list)
 
+def update_events(DB):
+    print "Mongo DB - Updating Events Collection..."
+
+    DB.events.remove()
+
+    events = {
+        'maintenance': 'wednesday'
+    };
+
+    events_list = [{'name': name, 'day': day} for (name, day) in events.items()]
+
+    DB.events.insert_many(events_list)
 
 def update_collections():
     DB_NAME = environ['DB_NAME']
@@ -123,6 +135,7 @@ def update_collections():
     update_collection(DB, 'items')
     update_tmr_collection(DB)
     update_units_nicknames(DB)
+    update_events(DB)
 
 
 ################################
