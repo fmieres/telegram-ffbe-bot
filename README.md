@@ -1,3 +1,7 @@
+# we've moved to gitlab https://gitlab.com/illiax/telegram-ffbe-bot
+
+=================================
+
 # telegram-ffbe-bot
 
 ## Modulo importación de datos
