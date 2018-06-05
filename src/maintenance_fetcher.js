@@ -1,3 +1,12 @@
+const moment = require('moment');
+
+module.exports = fetch, print;
+
+module.exports = {
+  fetch: fetch,
+  print: print
+}
+
 const https = require('https');
 
 function get_maintenances_urls(data) {
@@ -44,7 +53,7 @@ function get_maintenance_period(urls) {
 
 }
 
-function format_period(regex_match, timezone){
+function format_period(regex_match){
   //console.log(regex_match[1]); // Period
   //console.log(regex_match[2]); // Time Zone
 
@@ -55,14 +64,10 @@ function format_period(regex_match, timezone){
   let start_date = new Date(start);
   let end_date = new Date(end);
 
-  // TODO: Esto moverlo al tick, para mandar cada mensaje
-  start_date.setHours(start_date.getHours() + timezone);
-  end_date.setHours(end_date.getHours() + timezone);
-
   return {start: start_date, end: end_date};
 }
 
-function main(timezone) {
+function fetch() {
   return new Promise((accept, reject) => {
 
     https.get('https://deathsnacks.com/ffbe/news_gl.json', (response) => {
@@ -79,7 +84,7 @@ function main(timezone) {
             if (regex_match === null){
               reject('No maintenance info found');
             } else {
-              accept(format_period(regex_match, timezone));
+              accept(format_period(regex_match));
             }
           }, error => {
             reject(error);
@@ -98,7 +103,24 @@ function main(timezone) {
   });
 }
 
-main(-3).then(result => {
+function print(result, timezone) {
+  let start = result.start;
+  let end = result.end;
+
+  start.setUTCHours(start.getUTCHours() + timezone);
+  end.setUTCHours(end.getUTCHours() + timezone);
+
+  const format = "dddd, H:mm:ss";
+
+  let text = "<b>ANNOUNCEMENT:</b> Maintenance starting soon" +
+  "\n Starting time: " + moment.utc(start).format(format) +
+  "\n Ending time: " + moment.utc(end).format(format);
+  return text;
+}
+
+/*
+fetch().then(result => {
   console.log(result);
 
 }, error => console.log("Error: " + error));
+*/

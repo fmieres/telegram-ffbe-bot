@@ -4,7 +4,8 @@ const
   TMRPrinter = require('./printers/tmr'),
   ENV = require('../env'),
   TeleBot = require('telebot'),
-  { log } = require('./lib/utils')
+  { log } = require('./lib/utils'),
+  maintenance = require('./maintenance_fetcher')
 ;
 
 const
@@ -17,8 +18,14 @@ const
   REGEX_COMMAND_UNIT = /^\/unit\s+(\+)?(.+)$/i,
   REGEX_COMMAND_TMR = /^\/tmr\s+(.+)$/i,
   REGEX_COMMAND_HELP = /^\/help.*$/i,
-  REGEX_COMMAND_SUB = /^\/sub\s+(.+)$/i,
+  REGEX_COMMAND_SUB = /^\/sub\s+(.+)\s+(-?[0-9]+)$/i,
   REGEX_COMMAND_UNSUB = /^\/unsub\s+(.+)$/i
+;
+
+const
+  event_functions = {maintenance: maintenance.fetch},
+  event_printers = {maintenance: maintenance.print},
+  days_names = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
 ;
 
 const BROADCAST_TIME_START = '18:00:00';
@@ -57,15 +64,16 @@ function tmr(message, props){
 }
 
 function sub(message, props){
-  const identifier = props.match[1];
-  repo.create_subscription(message.chat.id, identifier, -3).then(
+  const event = props.match[1];
+  const timezone = props.match[2];
+  repo.create_subscription(message.chat.id, event, timezone).then(
     result => bot.sendMessage(message.chat.id, result, { parseMode : 'HTML' })
   );
 }
 
 function unsub(message, props){
-  const identifier = props.match[1];
-  repo.remove_subscription(message.chat.id, identifier).then(
+  const event = props.match[1];
+  repo.remove_subscription(message.chat.id, event).then(
     result => bot.sendMessage(message.chat.id, result, { parseMode : 'HTML' })
   );
 }
@@ -104,8 +112,28 @@ function replier(message) {
     bot.sendMessage(message.chat.id, text, { parseMode : 'HTML', ...extra_options })
 } 
 
-function broadcast_events() {
-  console.log("Broadcasting...");
+function broadcast_event(event) {
+  event_functions[event]().then(result => {
+
+    repo.search_event_subs_by_timezone(event).then(({value:timezones}) => {
+      Object.keys(timezones).forEach(timezone => {
+        const text = event_printers[event](result, parseInt(timezone));
+        let subs = timezones[timezone];
+        subs.map(sub => bot.sendMessage(sub.chat_id, text, { parseMode : 'HTML'}) );
+      });
+
+    });
+
+  }, error => log('Error: ' + error));
+  
+}
+
+function broadcast_events(now) {
+  console.log("--- Broadcasting ---");
+  const day_name = days_names[now.getDay()];
+  repo.search_for_events(day_name).then(
+    ({value:events}) => events.map(event => broadcast_event(event))
+  );
 }
 
 function try_to_broadcast() {
@@ -118,14 +146,14 @@ function try_to_broadcast() {
     let broadcast_time_end = new Date(broadcast_time_start);
     broadcast_time_end.setMinutes(broadcast_time_end.getMinutes() + BROADCAST_RESETS_OFFSET);
 
-    console.log("Current date: ", now);
-    console.log("Broadcast time START: ", broadcast_time_start);
-    console.log("Broadcast time END: ", broadcast_time_end);
+    //console.log("Current date: ", now);
+    //console.log("Broadcast time START: ", broadcast_time_start);
+    //console.log("Broadcast time END: ", broadcast_time_end);
     
     if (now > broadcast_time_start && now < broadcast_time_end) {
       ALREADY_BROADCASTED = true;
       log("ALREADY_BROADCASTED set to TRUE");
-      broadcast_events();
+      broadcast_events(now);
     }
   } else {
     let broadcast_reset_start = new Date();
@@ -134,8 +162,8 @@ function try_to_broadcast() {
     let broadcast_reset_end = new Date(broadcast_reset_start);
     broadcast_reset_end.setMinutes(broadcast_reset_end.getMinutes() + BROADCAST_RESETS_OFFSET);
 
-    console.log("Broadcast reset time START: ", broadcast_reset_start);
-    console.log("Broadcast reset time END: ", broadcast_reset_end);
+    //console.log("Broadcast reset time START: ", broadcast_reset_start);
+    //console.log("Broadcast reset time END: ", broadcast_reset_end);
 
     if (now > broadcast_reset_start && now < broadcast_reset_end) {
       log("ALREADY_BROADCASTED set to FALSE");
@@ -143,6 +171,5 @@ function try_to_broadcast() {
     }
   }
 
-  //bot.sendMessage(396486740, "TEST", { parseMode : 'HTML'})
 }
 

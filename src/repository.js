@@ -11,6 +11,7 @@ const
   COLLECTION_UNIT             = 'units',
   COLLECTION_UNITS_NICKNAMES  = 'units_nicknames',
   COLLECTION_SUBSCRIPTIONS    = 'subscriptions',
+  COLLECTION_EVENTS           = 'events',
   DB_NAME = ENV.DB_NAME,
   DB_URL  = ENV.DB_URL,
   SUBSCRIPTIONS = ['maintenance']
@@ -129,6 +130,43 @@ class Repository {
         accept('The specified event does not exist');
       });
     }
+  }
+
+  search_event_subs_by_timezone(event) {
+    /*
+    TODO: Buscar todos las 'subscriptions' que tengan el 'event'.
+    Hacer reduce para tener la forma:
+    {
+      <timezone1>: [subs],
+      <timezone2>: [subs]
+    }
+    */
+
+    const query = collection => {
+      return new Promise((accept, reject) => {
+        collection.find({event: event}).toArray(
+          (err, result) => {
+            if (err) reject(err);
+
+            accept(
+              result.reduce((acc, sub) => {
+                const tz = sub.timezone;
+                if (!(tz in acc)) acc[tz] = [];
+                acc[tz].push(sub);
+                return acc;
+              }, {})
+            );
+        });
+      });
+    };
+    return this._inner_query(query, COLLECTION_SUBSCRIPTIONS);
+  }
+
+  search_for_events(day_name) {
+    const query = collection => {
+      return collection.distinct('name', {day: day_name}).then(result => result);
+    };
+    return this._inner_query(query, COLLECTION_EVENTS);
   }
   
   find_equipment_by_name(name) {
