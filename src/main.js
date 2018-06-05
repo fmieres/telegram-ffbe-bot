@@ -111,41 +111,37 @@ function broadcast_events() {
 function try_to_broadcast() {
   const now = new Date();
 
-  let broadcast_time_start = new Date();
-  broadcast_time_start.setUTCHours( ...BROADCAST_TIME_START.split(':'));
-
-  let broadcast_time_end = new Date(broadcast_time_start);
-  broadcast_time_end.setMinutes(broadcast_time_end.getMinutes() + BROADCAST_RESETS_OFFSET);
-
-  console.log("Current date: ", now);
-  console.log("Broadcast time START: ", broadcast_time_start);
-  console.log("Broadcast time END: ", broadcast_time_end);
-  
   if (!ALREADY_BROADCASTED) {
+    let broadcast_time_start = new Date();
+    broadcast_time_start.setUTCHours( ...BROADCAST_TIME_START.split(':'));
+
+    let broadcast_time_end = new Date(broadcast_time_start);
+    broadcast_time_end.setMinutes(broadcast_time_end.getMinutes() + BROADCAST_RESETS_OFFSET);
+
+    console.log("Current date: ", now);
+    console.log("Broadcast time START: ", broadcast_time_start);
+    console.log("Broadcast time END: ", broadcast_time_end);
+    
     if (now > broadcast_time_start && now < broadcast_time_end) {
       ALREADY_BROADCASTED = true;
       log("ALREADY_BROADCASTED set to TRUE");
       broadcast_events();
     }
+  } else {
+    let broadcast_reset_start = new Date();
+    broadcast_reset_start.setUTCHours( ...ALREADY_BROADCASTED_RESET_TIME.split(':'));
+
+    let broadcast_reset_end = new Date(broadcast_reset_start);
+    broadcast_reset_end.setMinutes(broadcast_reset_end.getMinutes() + BROADCAST_RESETS_OFFSET);
+
+    console.log("Broadcast reset time START: ", broadcast_reset_start);
+    console.log("Broadcast reset time END: ", broadcast_reset_end);
+
+    if (now > broadcast_reset_start && now < broadcast_reset_end) {
+      log("ALREADY_BROADCASTED set to FALSE");
+      ALREADY_BROADCASTED = false;
+    }
   }
-
-
-  let broadcast_reset_start = new Date();
-  broadcast_reset_start.setUTCHours( ...ALREADY_BROADCASTED_RESET_TIME.split(':'));
-
-  let broadcast_reset_end = new Date(broadcast_reset_start);
-  broadcast_reset_end.setMinutes(broadcast_reset_end.getMinutes() + BROADCAST_RESETS_OFFSET);
-
-
-  console.log("Broadcast reset time START: ", broadcast_reset_start);
-  console.log("Broadcast reset time END: ", broadcast_reset_end);
-
-
-  if (now > broadcast_reset_start && now < broadcast_reset_end) {
-    log("ALREADY_BROADCASTED set to FALSE");
-    ALREADY_BROADCASTED = false;
-  }
-  
 
   //bot.sendMessage(396486740, "TEST", { parseMode : 'HTML'})
 }
